@@ -1,4 +1,4 @@
-globals [global-data] ;; Définir une variable globale pour stocker les données
+globals [global-data root] ;; Définir une variable globale pour stocker les données
 turtles-own [generation transformer trusted? verifier? informed?]
 
 to setup
@@ -10,22 +10,22 @@ to setup
   ;; Initialiser la donnée globale
   set global-data 100 ;; Exemple d'information initiale à partager
 
-  ;; Créer la hiérarchie et affecter les transformateurs
-  create-hierarchy
-  assign-transformers 4
-
-  reset-ticks
-end
-
-to create-hierarchy
-  ;; Créer la racine (génération 0)
-  let root make-node nobody 0
+    ;; Créer la racine (génération 0)
+  set root make-node nobody 0
   if root = nobody [
     user-message "Erreur: Impossible de créer la racine"
     stop
   ]
 
   show (word "Generation 0: Racine (1 tortue)") ;; Afficher la génération 0 dans la console
+
+
+  assign-transformers 4
+
+  reset-ticks
+end
+
+to create-hierarchy
 
   ;; Générer les enfants pour les générations suivantes
   generate-children (list root) 1
@@ -57,7 +57,7 @@ to generate-children [parents current-generation]
 
   ;; Afficher les informations de la génération courante
   show (word "Generation " current-generation ": " length new-generation " tortue(s)")
-
+  wait 0.3
   ;; Générer les enfants pour la prochaine génération
   generate-children new-generation (current-generation + 1)
 end
@@ -106,17 +106,16 @@ end
 
 
 to go
+
+  ;; Créer la hiérarchie et affecter les transformateurs
+  create-hierarchy
   ;; Appeler la procédure de passage d'informations
   ask turtles [
     pass-information
   ]
 
-  ;; Vérifier si toutes les tortues ont été informées
-  if not any? turtles with [not informed?] [
-    user-message "Tous les agents ont été informés, arrêt de la simulation."
-    stop ;; Arrêter la simulation lorsque toutes les tortues sont informées
-  ]
 
+  update-plots
 
   tick
 end
@@ -230,7 +229,7 @@ nb-gen
 nb-gen
 1
 10
-5.0
+2.0
 1
 1
 NIL
@@ -242,8 +241,8 @@ PLOT
 960
 169
 Person Count
-NIL
-NIL
+time
+generations
 0.0
 10.0
 0.0
